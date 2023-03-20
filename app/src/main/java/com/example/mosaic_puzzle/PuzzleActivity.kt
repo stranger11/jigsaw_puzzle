@@ -1,38 +1,39 @@
 package com.example.mosaic_puzzle
 
+import android.annotation.SuppressLint
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
-import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.exifinterface.media.ExifInterface
 import java.io.IOException
 import java.util.*
 import kotlin.math.abs
 
 class PuzzleActivity : AppCompatActivity() {
-    var pieces: List<PuzzlePiece?>? = null
-    var mCurrentPhotoPath: String? = null
-    var mCurrentPhotoUri: String? = null
+    private var pieces: List<PuzzlePiece?>? = null
+    private var mCurrentPhotoPath: String? = null
+    private var mCurrentPhotoUri: String? = null
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_puzzle)
         val layout = findViewById<RelativeLayout>(R.id.layout)
         val imageView = findViewById<ImageView>(R.id.imageView)
         val intent = intent
-        val flowers = intent.getStringExtra("flowers")
         mCurrentPhotoPath = intent.getStringExtra("mCurrentPhotoPath")
         mCurrentPhotoUri = intent.getStringExtra("mCurrentPhotoUri")
 
         // run image related code after the view was laid out
         // to have all dimensions calculated
         imageView.post {
-            if (flowers != null) {
-                setFlowerPic(imageView)
-            } else if (mCurrentPhotoPath != null) {
+            setFlowerPic(imageView)
+            if (mCurrentPhotoPath != null) {
                 setPicFromPath(mCurrentPhotoPath!!, imageView)
             } else if (mCurrentPhotoUri != null) {
                 imageView.setImageURI(Uri.parse(mCurrentPhotoUri))
@@ -45,7 +46,7 @@ class PuzzleActivity : AppCompatActivity() {
                 piece!!.setOnTouchListener(touchListener)
                 layout.addView(piece)
                 // randomize position, on the bottom of the screen
-                val lParams = piece!!.getLayoutParams() as RelativeLayout.LayoutParams
+                val lParams = piece.layoutParams as RelativeLayout.LayoutParams
                 lParams.leftMargin = Random().nextInt(layout.width - piece.pieceWidth)
                 lParams.topMargin = layout.height - piece.pieceHeight
                 piece.layoutParams = lParams
@@ -81,6 +82,8 @@ class PuzzleActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun splitImage(): List<PuzzlePiece> {
         val rows = 4
         val cols = 3
@@ -99,7 +102,9 @@ class PuzzleActivity : AppCompatActivity() {
         val croppedImageHeight = scaledBitmapHeight - 2 * abs(scaledBitmapTop)
         val scaledBitmap =
             Bitmap.createScaledBitmap(bitmap, scaledBitmapWidth, scaledBitmapHeight, true)
+
         val croppedBitmap = Bitmap.createBitmap(
+
             scaledBitmap,
             abs(scaledBitmapLeft),
             abs(scaledBitmapTop),
@@ -304,7 +309,7 @@ class PuzzleActivity : AppCompatActivity() {
     }
 
     private val isGameOver: Boolean
-        private get() {
+        get() {
             for (piece in pieces!!) {
                 if (piece!!.canMove) {
                     return false
@@ -326,7 +331,7 @@ class PuzzleActivity : AppCompatActivity() {
         val photoH = bmOptions.outHeight
 
         // Determine how much to scale down the image
-        val scaleFactor = Math.min(photoW / targetW, photoH / targetH)
+        val scaleFactor = (photoW / targetW).coerceAtMost(photoH / targetH)
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false

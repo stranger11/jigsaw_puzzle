@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun toPuzzle() {
         val intent = Intent(applicationContext, PuzzleActivity::class.java)
-        intent.putExtra("flowers", R.drawable.flowers)
         startActivity(intent)
     }
 
