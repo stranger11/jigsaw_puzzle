@@ -3,7 +3,7 @@ package com.example.mosaic_puzzle
 import android.content.Context
 import androidx.appcompat.widget.AppCompatImageView
 
-class PuzzlePiece(context: Context?) : AppCompatImageView(context!!) {
+class PuzzlePiece(context: Context) : AppCompatImageView(context) {
     var xCoord = 0
     var yCoord = 0
     var pieceWidth = 0
